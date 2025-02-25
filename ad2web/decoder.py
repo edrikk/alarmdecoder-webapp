@@ -23,6 +23,7 @@ from socketioflaskdebug.debugger import SocketIODebugger
 from sqlalchemy.orm.exc import NoResultFound
 
 from flask import Blueprint, Response, request, g, current_app
+from flask_login import current_user
 import jsonpickle
 
 from OpenSSL import SSL
@@ -826,7 +827,7 @@ class DecoderNamespace(BaseNamespace, BroadcastMixin):
                     # check setup complete
                     setup_stage = Setting.get_by_name('setup_stage').value
 
-                    if (setup_stage and setup_stage != SETUP_COMPLETE) or user_id:
+                    if (setup_stage and setup_stage != SETUP_COMPLETE) or user_is_authenticated(current_user):
                         self.add_acl_method('on_keypress')
                         self.add_acl_method('on_firmwareupload')
                         self.add_acl_method('on_test')
