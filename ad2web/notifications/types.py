@@ -1141,7 +1141,7 @@ class CustomNotification(BaseNotification):
             return True
         else:
             app.logger.info('Event Custom Notification Failed')
-            raise Exception('Custom Notification Failed (' + str(http_response.status) + ") " + http_response.reason)
+            raise Exception('Custom Notification Failed (' + str(http_response.status) + ") " + http_response.reason + " Headers:" + str(self.headers) + " Body:" + str(data))
 
     # Warning: Threaded so it may be sent later and state may change.
     # Never access any AD2* state vars in a threaded function.
@@ -1175,6 +1175,8 @@ class CustomNotification(BaseNotification):
     @raise_with_stack
     def send(self, type, text, raw):
         self.msg_to_send = text
+        message_string = 'Primary Residence Alarm Event: %s' % text
+        json_data = {"text": message_string}
 
         result = False
         if check_time_restriction(self.starttime, self.endtime):
@@ -1211,7 +1213,7 @@ class CustomNotification(BaseNotification):
                    result =  self._do_post(self._dict_to_xml('notification', notify_data))
 
                 if self.post_type == JSON:
-                    result = self._do_post(self._dict_to_json(notify_data) )
+                    result = self._do_post(self._dict_to_json(json_data))
 
             if self.method == CUSTOM_METHOD_GET_TYPE:
                 if self.post_type == URLENCODE:
